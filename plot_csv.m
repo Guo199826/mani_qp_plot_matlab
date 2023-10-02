@@ -7,17 +7,22 @@ addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
 % position_real = readmatrix('joint_position_real_joint_limit.csv'); 
 % velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
 % velocity_real = readmatrix('joint_velocity_real_joint_limit.csv'); 
-position_guid = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/q_position_mean_traj.csv'); 
-position_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_position_real_demo_offset.csv'); 
-velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
-xtrans_sigma = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
+% position_guid = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/q_position_mean_traj.csv'); 
+% position_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_position_real_demo_offset.csv'); 
+% velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
+% velocity_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
+
+position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit_.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit_ddq.csv'); 
+velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_joint_limit_.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_joint_limit_ddq.csv'); 
+xtrans_sigma = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
 % xtrans_mean = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
 xtrans_mean = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/wrist_translation.csv');
 
 xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
 % remove time stamp and other useless columns
-position_guid = position_guid(:,1:end);
+position_guid = position_guid(:,5:end);
 position_real = position_real(:,5:end);
 velocity_guid = velocity_guid(:,5:end);
 velocity_real = velocity_real(:,5:end);
@@ -26,9 +31,9 @@ xtrans_sigma = xtrans_sigma(:,1:end);
 [xtrans_mean_rows, xtrans_mean_cols] = size(xtrans_mean);
 xtrans_mean = xtrans_mean(:,1:end);
 [sigma_rows, sigma_cols] = size(xtrans_sigma);
-[num_rows, num_columns] = size(position_guid);
+[num_rows, num_columns] = size(position_guid)
 [num_rows_mean, num_columns_mean] = size(xtrans_mean);
-[num_rows_real, num_columns_real] = size(position_real);
+[num_rows_real, num_columns_real] = size(position_real)
 [num_rows_v, num_columns_v] = size(velocity_guid);
 [num_rows_v_real, num_columns_v_real] = size(velocity_real);
 [xtrans_pose_rows, xtrans_pose_cols] = size(xtrans_pose);
@@ -115,13 +120,13 @@ acc_real = diff(velocity_real,1,1)/dt;
 figure(3)
 hold on;
 % guidance
-plot([1:num_rows_v-1].*dt, acc_guid(:,1), '--','color','r','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,2), '--','color','g','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,3), '--','color','b','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,4), '--','color','c','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,5), '--','color','m','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,6), '--','color','#D95319','Linewidth',linewidth_g);
-plot([1:num_rows_v-1].*dt, acc_guid(:,7), '--','color','k','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,1), '--','color','r','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,2), '--','color','g','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,3), '--','color','b','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,4), '--','color','c','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,5), '--','color','m','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,6), '--','color','#D95319','Linewidth',linewidth_g);
+% plot([1:num_rows_v-1].*dt, acc_guid(:,7), '--','color','k','Linewidth',linewidth_g);
 % % real traj
 plot([1:num_rows_v_real-1].*dt, acc_real(:,1), '-','color','r','Linewidth',linewidth_r);
 plot([1:num_rows_v_real-1].*dt, acc_real(:,2), '-','color','g','Linewidth',linewidth_r);
@@ -146,109 +151,109 @@ xt_traj_guid = zeros(3,num_rows);
 xt_traj_real = zeros(3,num_rows_real);
 xt_traj_guid_rot = zeros(4,num_rows);
 xt_traj_real_rot = zeros(4,num_rows_real);
-for row = 1:num_rows
-    % forward kinematic (guid)
-    xt = robot.fkm(position_guid(row,:));
-    xt_tran = vec3(translation(xt));
-    xt_rot = vec4(rotation(xt));
-    xt_traj_guid(:,row) = xt_tran;
-    xt_traj_guid_rot(:,row) = xt_rot;
-end
-for row_real = 1:num_rows_real
-    % forward kinematic (real)
-    xt_real = robot.fkm(position_real(row_real,:));
-    xt_tran_real = vec3(translation(xt_real));
-    xt_rot_real = vec4(rotation(xt_real));
-    xt_traj_real(:,row_real) = xt_tran_real;
-    xt_traj_real_rot(:,row_real) = xt_rot_real;
-    % dot_x = Jt_geom_t * velocity_real(row_real, :)';
-end
+% for row = 1:num_rows
+%     % forward kinematic (guid)
+%     xt = robot.fkm(position_guid(row,:));
+%     xt_tran = vec3(translation(xt));
+%     xt_rot = vec4(rotation(xt));
+%     xt_traj_guid(:,row) = xt_tran;
+%     xt_traj_guid_rot(:,row) = xt_rot;
+% end
+% for row_real = 1:num_rows_real
+%     % forward kinematic (real)
+%     xt_real = robot.fkm(position_real(row_real,:));
+%     xt_tran_real = vec3(translation(xt_real));
+%     xt_rot_real = vec4(rotation(xt_real));
+%     xt_traj_real(:,row_real) = xt_tran_real;
+%     xt_traj_real_rot(:,row_real) = xt_rot_real;
+%     % dot_x = Jt_geom_t * velocity_real(row_real, :)';
+% end
 
-figure(4)
-hold on;
-% guidance
-% plot([1:num_rows].*dt, xt_traj_guid(1,:), '--','color','r','Linewidth',linewidth_g);
-% plot([1:num_rows].*dt, xt_traj_guid(2,:), '--','color','g','Linewidth',linewidth_g);
-% plot([1:num_rows].*dt, xt_traj_guid(3,:), '--','color','b','Linewidth',linewidth_g);
+% figure(4)
+% hold on;
+% % guidance
+% % plot([1:num_rows].*dt, xt_traj_guid(1,:), '--','color','r','Linewidth',linewidth_g);
+% % plot([1:num_rows].*dt, xt_traj_guid(2,:), '--','color','g','Linewidth',linewidth_g);
+% % plot([1:num_rows].*dt, xt_traj_guid(3,:), '--','color','b','Linewidth',linewidth_g);
+% % % real traj
+% % plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(1,:)  + dot_x(1,:), '-','color','r','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(2,:) + dot_x(2,:), '-','color','g','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(3,:)  + dot_x(3,:), '-','color','b','Linewidth',linewidth_r);
+% % guidance
+% plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1), '--','color','r','Linewidth',linewidth_r);
+% plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2), '--','color','g','Linewidth',linewidth_r);
+% plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3), '--','color','b','Linewidth',linewidth_r);
 % % real traj
-% plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(1,:)  + dot_x(1,:), '-','color','r','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(2,:) + dot_x(2,:), '-','color','g','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(3,:)  + dot_x(3,:), '-','color','b','Linewidth',linewidth_r);
-% guidance
-plot([1:xtrans_mean_rows].*dt, xtrans_pose(1,:), '--','color','r','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(2,:), '--','color','g','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(3,:), '--','color','b','Linewidth',linewidth_r);
-% real traj
-% plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
-% plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
-
-% t = [1:sigma_rows].*dt;
-% x_lb = xtrans_mean(:,1)  - xtrans_sigma(:,1);
-% x_ub = xtrans_mean(:,1) + xtrans_sigma(:,1);
-% y_lb = xtrans_mean(:,2) - xtrans_sigma(:,2);
-% y_ub = xtrans_mean(:,2) + xtrans_sigma(:,2);
-% z_lb = xtrans_mean(:,3) - xtrans_sigma(:,3);
-% z_ub = xtrans_mean(:,3) + xtrans_sigma(:,3);
-
-% plot(t, x_lb, 'r', 'LineStyle','none');
-% plot(t, x_ub, 'r', 'LineStyle','none');
-% t2 = [t, fliplr(t)];
-% inBetween_x = [x_lb', flip(x_ub)'];
-% inBetween_y = [y_lb', flip(y_ub)'];
-% inBetween_z = [z_lb', flip(z_ub)'];
-% fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
-% fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
-% fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
-
-% y2 = 4 + cos(x).*exp(0.1*x);
-% y_lb = ;
-% y_ub = xt_traj_real
-% hold on
-% area(x,y2,'FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3)
-
-set(gca,'fontsize',14);
-xlim([0 num_rows*dt])
-xlabel('$t$','fontsize',22,'Interpreter','latex');
-ylabel('$q$','fontsize',22,'Interpreter','latex');
-legend('x','y','z');
-xlabel('Time (dt=0.01s)');
-ylabel(['Cartesian Position']);
-title(['Plot of cartesian position during guidance']);
-grid on;
-
-
-% Plot cartesian orientation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure(5)
-hold on;
-xt_traj_real_rot(1,:);
-% guidance
+% % plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
+% % plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
+% 
+% % t = [1:sigma_rows].*dt;
+% % x_lb = xtrans_mean(:,1)  - xtrans_sigma(:,1);
+% % x_ub = xtrans_mean(:,1) + xtrans_sigma(:,1);
+% % y_lb = xtrans_mean(:,2) - xtrans_sigma(:,2);
+% % y_ub = xtrans_mean(:,2) + xtrans_sigma(:,2);
+% % z_lb = xtrans_mean(:,3) - xtrans_sigma(:,3);
+% % z_ub = xtrans_mean(:,3) + xtrans_sigma(:,3);
+% 
+% % plot(t, x_lb, 'r', 'LineStyle','none');
+% % plot(t, x_ub, 'r', 'LineStyle','none');
+% % t2 = [t, fliplr(t)];
+% % inBetween_x = [x_lb', flip(x_ub)'];
+% % inBetween_y = [y_lb', flip(y_ub)'];
+% % inBetween_z = [z_lb', flip(z_ub)'];
+% % fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
+% % fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
+% % fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
+% 
+% % y2 = 4 + cos(x).*exp(0.1*x);
+% % y_lb = ;
+% % y_ub = xt_traj_real
+% % hold on
+% % area(x,y2,'FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3)
+% 
+% set(gca,'fontsize',14);
+% xlim([0 num_rows*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$q$','fontsize',22,'Interpreter','latex');
+% legend('x','y','z');
+% xlabel('Time (dt=0.01s)');
+% ylabel(['Cartesian Position']);
+% title(['Plot of cartesian position during guidance']);
+% grid on;
+% 
+% 
+% % Plot cartesian orientation %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% figure(5)
+% hold on;
+% xt_traj_real_rot(1,:);
+% % guidance
+% % plot([1:num_rows].*dt, xt_traj_guid_rot(1,:), '--','color','r','Linewidth',linewidth_g);
+% % plot([1:num_rows].*dt, xt_traj_guid_rot(2,:), '--','color','g','Linewidth',linewidth_g);
+% % plot([1:num_rows].*dt, xt_traj_guid_rot(3,:), '--','color','b','Linewidth',linewidth_g);
+% % plot([1:num_rows].*dt, xt_traj_guid_rot(4,:), '--','color','c','Linewidth',linewidth_g);
+% % guidance
 % plot([1:num_rows].*dt, xt_traj_guid_rot(1,:), '--','color','r','Linewidth',linewidth_g);
 % plot([1:num_rows].*dt, xt_traj_guid_rot(2,:), '--','color','g','Linewidth',linewidth_g);
 % plot([1:num_rows].*dt, xt_traj_guid_rot(3,:), '--','color','b','Linewidth',linewidth_g);
 % plot([1:num_rows].*dt, xt_traj_guid_rot(4,:), '--','color','c','Linewidth',linewidth_g);
-% guidance
-plot([1:num_rows].*dt, xt_traj_guid_rot(1,:), '--','color','r','Linewidth',linewidth_g);
-plot([1:num_rows].*dt, xt_traj_guid_rot(2,:), '--','color','g','Linewidth',linewidth_g);
-plot([1:num_rows].*dt, xt_traj_guid_rot(3,:), '--','color','b','Linewidth',linewidth_g);
-plot([1:num_rows].*dt, xt_traj_guid_rot(4,:), '--','color','c','Linewidth',linewidth_g);
-% real traj
-plot([1:num_rows_real].*dt, xt_traj_real_rot(1,:), '-','color','r','Linewidth',linewidth_r);
-plot([1:num_rows_real].*dt, xt_traj_real_rot(2,:), '-','color','g','Linewidth',linewidth_r);
-plot([1:num_rows_real].*dt, xt_traj_real_rot(3,:), '-','color','b','Linewidth',linewidth_r);
-plot([1:num_rows_real].*dt, xt_traj_real_rot(4,:), '-','color','c','Linewidth',linewidth_r);
-set(gca,'fontsize',14);
-xlim([0 num_rows*dt])
-xlabel('$t$','fontsize',22,'Interpreter','latex');
-ylabel('$q$','fontsize',22,'Interpreter','latex');
-legend('x','y','z');
-xlabel('Time (dt=0.01s)');
-ylabel(['Cartesian Orientation']);
-title(['Plot of cartesian orientation during guidance']);
-grid on;
+% % real traj
+% plot([1:num_rows_real].*dt, xt_traj_real_rot(1,:), '-','color','r','Linewidth',linewidth_r);
+% plot([1:num_rows_real].*dt, xt_traj_real_rot(2,:), '-','color','g','Linewidth',linewidth_r);
+% plot([1:num_rows_real].*dt, xt_traj_real_rot(3,:), '-','color','b','Linewidth',linewidth_r);
+% plot([1:num_rows_real].*dt, xt_traj_real_rot(4,:), '-','color','c','Linewidth',linewidth_r);
+% set(gca,'fontsize',14);
+% xlim([0 num_rows*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$q$','fontsize',22,'Interpreter','latex');
+% legend('x','y','z');
+% xlabel('Time (dt=0.01s)');
+% ylabel(['Cartesian Orientation']);
+% title(['Plot of cartesian orientation during guidance']);
+% grid on;
 
 % Plot distance between current and desired ME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 d = zeros(num_rows_real,1);
@@ -279,114 +284,114 @@ end
 
 % Plot Manipulability Ellipsoid %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % cartesian cartesian velocity (T) 
-Jt_geom_t = zeros(3,7);
-Me_proj = zeros(3,3);
-
-xt_xy = zeros(2,1);
-xt_xz = zeros(2,1);
-xt_yz = zeros(2,1);
-dxt_xy = zeros(2,1);
-dxt_xz = zeros(2,1);
-dxt_yz = zeros(2,1);
-counter = 0;
-figure(6)
-for row_real = 1:50:num_rows_real
-    counter = counter + 1;
-    % ME: real traj
-    Jt_geom = geomJ(robot,position_real(row_real,:));
-    J_xy = Jt_geom(4:5,:);
-    J_xz(1,:) = Jt_geom(4,:);
-    J_xz(2,:) = Jt_geom(6,:);
-    J_yz = Jt_geom(5:6,:);
-    Me_ct = Jt_geom * Jt_geom';
-    Me_ct_xy = J_xy * J_xy';
-    Me_ct_xz = J_xz * J_xz';
-    Me_ct_yz = J_yz * J_yz';
-
-    % ME: from guidance
-    Jt_geom_d = geomJ(robot,position_guid(row_real,:));
-    J_xy_d = Jt_geom_d(4:5,:);
-    J_xz_d(1,:) = Jt_geom_d(4,:);
-    J_xz_d(2,:) = Jt_geom_d(6,:);
-    J_yz_d = Jt_geom_d(5:6,:);
-    Me_d = Jt_geom_d * Jt_geom_d'; 
-    Me_d_xy = J_xy_d * J_xy_d';
-    Me_d_xz = J_xz_d * J_xz_d';
-    Me_d_yz = J_yz_d * J_yz_d';
-
-    % xt
-    xt_xy = xt_traj_real(1:2,row_real);
-    xt_xz(1,1) = xt_traj_real(1,row_real);
-    xt_xz(2,1) = xt_traj_real(3,row_real);
-    xt_yz = xt_traj_real(2:3,row_real);
-    
-    
-    subplot(1,3,1);
-    hold on;
-    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
-    trans = 0.1 + 0.01*counter;
-    plotGMM(xt_xy, 1E-2*Me_d_xy, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_xy, 1E-2*Me_ct_xy, colTmp,  .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$x$','fontsize',38,'Interpreter','latex');
-    ylabel('$y$','fontsize',38,'Interpreter','latex');
-
-    subplot(1,3,2);
-    hold on;
-    plotGMM(xt_xz, 1E-2*Me_d_xz, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_xz, 1E-2*Me_ct_xz, colTmp, .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$x$','fontsize',38,'Interpreter','latex');
-    ylabel('$z$','fontsize',38,'Interpreter','latex');
-
-    subplot(1,3,3);
-    hold on;
-    plotGMM(xt_yz, 1E-2*Me_d_yz, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_yz, 1E-2*Me_ct_yz, colTmp, .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$y$','fontsize',38,'Interpreter','latex');
-    ylabel('$z$','fontsize',38,'Interpreter','latex');
-    title(['Plot real and desired ME']);
-    % drawnow;
-
-end
-% Plot projected ME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% for row_real = 1:num_rows_real
-% % projected ME
-%     dxt_xy = dxt_traj_real(1:2,row_real);
-%     dxt_xz(1,1) = dxt_traj_real(1,row_real);
-%     dxt_xz(2,1) = dxt_traj_real(3,row_real);
-%     dxt_yz = dxt_traj_real(2:3,row_real);
-%     Me_proj_xy = dxt_xy' * (J_xy*J_xy')*dxt_xy
-%     Me_proj_xz = dxt_xz' * (J_xz*J_xz')*dxt_xz;
-%     Me_proj_yz = dxt_yz' * (J_yz*J_yz')*dxt_yz;
+% Jt_geom_t = zeros(3,7);
+% Me_proj = zeros(3,3);
+% 
+% xt_xy = zeros(2,1);
+% xt_xz = zeros(2,1);
+% xt_yz = zeros(2,1);
+% dxt_xy = zeros(2,1);
+% dxt_xz = zeros(2,1);
+% dxt_yz = zeros(2,1);
+% counter = 0;
+% figure(6)
+% for row_real = 1:50:num_rows_real
+%     counter = counter + 1;
+%     % ME: real traj
+%     Jt_geom = geomJ(robot,position_real(row_real,:));
+%     J_xy = Jt_geom(4:5,:);
+%     J_xz(1,:) = Jt_geom(4,:);
+%     J_xz(2,:) = Jt_geom(6,:);
+%     J_yz = Jt_geom(5:6,:);
+%     Me_ct = Jt_geom * Jt_geom';
+%     Me_ct_xy = J_xy * J_xy';
+%     Me_ct_xz = J_xz * J_xz';
+%     Me_ct_yz = J_yz * J_yz';
+% 
+%     % ME: from guidance
+%     Jt_geom_d = geomJ(robot,position_guid(row_real,:));
+%     J_xy_d = Jt_geom_d(4:5,:);
+%     J_xz_d(1,:) = Jt_geom_d(4,:);
+%     J_xz_d(2,:) = Jt_geom_d(6,:);
+%     J_yz_d = Jt_geom_d(5:6,:);
+%     Me_d = Jt_geom_d * Jt_geom_d'; 
+%     Me_d_xy = J_xy_d * J_xy_d';
+%     Me_d_xz = J_xz_d * J_xz_d';
+%     Me_d_yz = J_yz_d * J_yz_d';
+% 
+%     % xt
+%     xt_xy = xt_traj_real(1:2,row_real);
+%     xt_xz(1,1) = xt_traj_real(1,row_real);
+%     xt_xz(2,1) = xt_traj_real(3,row_real);
+%     xt_yz = xt_traj_real(2:3,row_real);
+% 
+% 
+%     subplot(1,3,1);
+%     hold on;
+%     colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+%     trans = 0.1 + 0.01*counter;
+%     plotGMM(xt_xy, 1E-2*Me_d_xy, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_xy, 1E-2*Me_ct_xy, colTmp,  .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$x$','fontsize',38,'Interpreter','latex');
+%     ylabel('$y$','fontsize',38,'Interpreter','latex');
+% 
+%     subplot(1,3,2);
+%     hold on;
+%     plotGMM(xt_xz, 1E-2*Me_d_xz, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_xz, 1E-2*Me_ct_xz, colTmp, .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$x$','fontsize',38,'Interpreter','latex');
+%     ylabel('$z$','fontsize',38,'Interpreter','latex');
+% 
+%     subplot(1,3,3);
+%     hold on;
+%     plotGMM(xt_yz, 1E-2*Me_d_yz, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_yz, 1E-2*Me_ct_yz, colTmp, .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$y$','fontsize',38,'Interpreter','latex');
+%     ylabel('$z$','fontsize',38,'Interpreter','latex');
+%     title(['Plot real and desired ME']);
+%     % drawnow;
+% 
 % end
-% cartesian velocity traj
-dxt_traj_real = zeros(3,num_rows_real-1);
-proj_me = zeros(1,num_rows_real-1);
-for i = 2:num_rows_real
-    dxt_traj_real(:,i-1) = (xt_traj_real(:,i) - xt_traj_real(:,i-1))/dt;
-    Jt_geom = geomJ(robot,position_real(i,:));
-    Jt_geom_t = Jt_geom(4:6,:);
-    proj_me(1,i-1) = dxt_traj_real(:,i-1)' * (Jt_geom_t*(Jt_geom_t'))*dxt_traj_real(:,i-1);
-end
+% % Plot projected ME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % for row_real = 1:num_rows_real
+% % % projected ME
+% %     dxt_xy = dxt_traj_real(1:2,row_real);
+% %     dxt_xz(1,1) = dxt_traj_real(1,row_real);
+% %     dxt_xz(2,1) = dxt_traj_real(3,row_real);
+% %     dxt_yz = dxt_traj_real(2:3,row_real);
+% %     Me_proj_xy = dxt_xy' * (J_xy*J_xy')*dxt_xy
+% %     Me_proj_xz = dxt_xz' * (J_xz*J_xz')*dxt_xz;
+% %     Me_proj_yz = dxt_yz' * (J_yz*J_yz')*dxt_yz;
+% % end
+% % cartesian velocity traj
+% dxt_traj_real = zeros(3,num_rows_real-1);
+% proj_me = zeros(1,num_rows_real-1);
+% for i = 2:num_rows_real
+%     dxt_traj_real(:,i-1) = (xt_traj_real(:,i) - xt_traj_real(:,i-1))/dt;
+%     Jt_geom = geomJ(robot,position_real(i,:));
+%     Jt_geom_t = Jt_geom(4:6,:);
+%     proj_me(1,i-1) = dxt_traj_real(:,i-1)' * (Jt_geom_t*(Jt_geom_t'))*dxt_traj_real(:,i-1);
+% end
 
-figure(7)
-hold on;
-% distance
-plot([1:num_rows_real-1].*dt, proj_me(1,:), '-','color','r','Linewidth',linewidth_r);
-set(gca,'fontsize',14);
-xlim([0 num_rows*dt])
-xlabel('$t$','fontsize',22,'Interpreter','latex');
-ylabel('$ME$','fontsize',22,'Interpreter','latex');
-legend('x','y','z');
-xlabel('Time /s');
-ylabel(['Manipulability']);
-title(['Plot of projected ME']);
-grid on;
+% figure(7)
+% hold on;
+% % distance
+% plot([1:num_rows_real-1].*dt, proj_me(1,:), '-','color','r','Linewidth',linewidth_r);
+% set(gca,'fontsize',14);
+% xlim([0 num_rows*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$ME$','fontsize',22,'Interpreter','latex');
+% legend('x','y','z');
+% xlabel('Time /s');
+% ylabel(['Manipulability']);
+% title(['Plot of projected ME']);
+% grid on;
 
 
 % % Desired and initial manipulability ellipsoids

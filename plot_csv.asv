@@ -7,10 +7,10 @@ addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
 % position_real = readmatrix('joint_position_real_joint_limit.csv'); 
 % velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
 % velocity_real = readmatrix('joint_velocity_real_joint_limit.csv'); 
-position_guid = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/q_position_mean_traj.csv'); 
-position_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_position_real_demo_offset.csv'); 
+position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit.csv'); 
 velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_joint_limit.csv'); 
 xtrans_sigma = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
 % xtrans_mean = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
 xtrans_mean = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/wrist_translation.csv');
@@ -23,7 +23,7 @@ velocity_guid = velocity_guid(:,5:end);
 velocity_real = velocity_real(:,5:end);
 xtrans_sigma = xtrans_sigma(:,1:end);
 [sigma_rows, sigma_cols] = size(xtrans_sigma);
-[xtrans_mean_rows, xtrans_mean_cols] = size(xtrans_mean);
+[xtrans_mean_rows, xtrans_mean_cols] = size(xtrans_mean)
 xtrans_mean = xtrans_mean(:,1:end);
 [sigma_rows, sigma_cols] = size(xtrans_sigma);
 [num_rows, num_columns] = size(position_guid);
@@ -36,7 +36,8 @@ dt = 0.01;
 linewidth_g=1;
 linewidth_r=1;
 
-% Transpose DQ to 
+% Transpose DQ (8) to (6)
+xtrans_pose_ = xtrans_pose();
 
 close all;
 % Colors
@@ -177,9 +178,9 @@ hold on;
 % plot([1:num_rows_real].*dt, xt_traj_real(2,:) + dot_x(2,:), '-','color','g','Linewidth',linewidth_r);
 % plot([1:num_rows_real].*dt, xt_traj_real(3,:)  + dot_x(3,:), '-','color','b','Linewidth',linewidth_r);
 % guidance
-plot([1:xtrans_mean_rows].*dt, xtrans_pose(1,:), '--','color','r','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(2,:), '--','color','g','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(3,:), '--','color','b','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1), '--','color','r','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2), '--','color','g','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3), '--','color','b','Linewidth',linewidth_r);
 % real traj
 % plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
 % plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
