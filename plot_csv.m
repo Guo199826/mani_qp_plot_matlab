@@ -2,14 +2,14 @@
 % Plot results from csv file
 % Please change the base's reference frame in FrankaEmikaPandaRobot.m!
 % (try to combine several loops together
-addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
+% addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
 % position_guid = readmatrix('joint_position_exam_force_traj.csv'); 
 % position_real = readmatrix('joint_position_real_joint_limit.csv'); 
 % velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
 % velocity_real = readmatrix('joint_velocity_real_joint_limit.csv'); 
-position_guid = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/q_position_mean_traj.csv'); 
-position_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_position_real_demo_offset.csv'); 
-velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
+position_guid = readmatrix('data/q_mean_traj.csv'); 
+position_real = readmatrix('./joint_position_real_demo_offset.csv'); 
+velocity_guid = readmatrix('./joint_velocity_exam_force.csv'); 
 velocity_real = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
 xtrans_sigma = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
 % xtrans_mean = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
