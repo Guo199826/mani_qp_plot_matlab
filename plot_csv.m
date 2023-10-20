@@ -8,9 +8,9 @@ addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
 % velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
 % velocity_real = readmatrix('joint_velocity_real_joint_limit.csv'); 
 % position_guid = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/bags/joint_position_real_1006.csv'); 
-position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_dyn.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_demo.csv'); 
 % velocity_guid = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/bags/joint_velocity_real_1006.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_dyn.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
 
 position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_dyn.csv'); 
 % position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit_ddq.csv'); 
@@ -23,7 +23,7 @@ xtrans_mean = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/d
 xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
 % remove time stamp and other useless columns
 position_guid = position_guid(:,5:end);
-position_real = position_real(:,5:end);
+position_real = position_real(1:1745,5:end);
 velocity_guid = velocity_guid(:,5:end);
 velocity_real = velocity_real(:,5:end);
 xtrans_sigma = xtrans_sigma(:,1:end);
@@ -276,7 +276,7 @@ for row_real = 1:num_rows_real
     % vel. Manip.
     Me_ct = Jt_geom * Jt_geom';
     % dyn. Manip.
-    Me_dyn_ct = Jt_geom/Mass_ct * (Jt_geom/Mass_ct)';
+    Me_dyn_ct = (Jt_geom/Mass_ct) * (Jt_geom/Mass_ct)';
     % singular value of Jacobian
     ev_real(:,row_real) = svd(Jt_geom);
 
@@ -287,7 +287,7 @@ for row_real = 1:num_rows_real
     % vel. Manip.
     Me_d = Jt_geom_d * Jt_geom_d'; 
     % dyn. Manip.
-    Me_dyn_d = Jt_geom_d/Mass_d * (Jt_geom_d/Mass_d)';
+    Me_dyn_d = (Jt_geom_d/Mass_d) * (Jt_geom_d/Mass_d)';
     % singular value of Jacobian
     ev_guid(:,row_real) = svd(Jt_geom_d);
     % distance between real and desired (velocity Manip.)
@@ -311,7 +311,7 @@ counter = 0;
 
 % Vel. Manip.
 figure(6)
-for row_real = 1:50:num_rows_real
+for row_real = 1:20:num_rows_real % 50
     counter = counter + 1;
     % ME: real traj
     Jt_geom = geomJ(robot,position_real(row_real,:));
@@ -343,7 +343,8 @@ for row_real = 1:50:num_rows_real
 
     subplot(1,3,1);
     hold on;
-    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+    % colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.003,.003,.003] * counter;
     trans = 0.1 + 0.01*counter;
     plotGMM(xt_xy, 1E-2*Me_d_xy, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
     plotGMM(xt_xy, 1E-2*Me_ct_xy, colTmp,  .4, '-', 3, 1); % Scaled matrix!
@@ -376,21 +377,22 @@ end
 
 % Dyn. Manip.
 figure(7)
-for row_real = 1:50:num_rows_real
+% for row_real = 1:20:num_rows_real %50
+for row_real = 1:3
     counter = counter + 1;
     % ME: real traj
     % Get Mass Matrix of panda
     Mass_ct = get_MassMatrix(position_real(row_real,:)); 
     Jt_geom = geomJ(robot,position_real(row_real,:));
     J_xy = Jt_geom(4:5,:);
-    J_xz = Jt_geom(4,:);
-    J_xz = Jt_geom(6,:);
+    J_xz(1,:) = Jt_geom(4,:);
+    J_xz(2,:) = Jt_geom(6,:);
     J_yz = Jt_geom(5:6,:);
-    Me_ct_xy_dyn = J_xy/Mass_ct * (J_xy/Mass_ct)';
-    Me_ct_xz_dyn = J_xz/Mass_ct * (J_xz/Mass_ct)';
-    Me_ct_yz_dyn = J_yz/Mass_ct * (J_yz/Mass_ct)';
+    Me_ct_xy_dyn = (J_xy/Mass_ct) * (J_xy/Mass_ct)';
+    Me_ct_xz_dyn = (J_xz/Mass_ct) * (J_xz/Mass_ct)';
+    Me_ct_yz_dyn = (J_yz/Mass_ct) * (J_yz/Mass_ct)';
     % dyn. Manip.
-    Me_dyn_ct = Jt_geom/Mass_ct * (Jt_geom/Mass_ct)';
+    Me_dyn_ct = (Jt_geom/Mass_ct) * (Jt_geom/Mass_ct)';
 
     % ME: from guidance
     % Get Mass Matrix of panda
@@ -401,9 +403,9 @@ for row_real = 1:50:num_rows_real
     J_xz_d(2,:) = Jt_geom_d(6,:);
     J_yz_d = Jt_geom_d(5:6,:);
     % Me_d = Jt_geom_d * Jt_geom_d'; 
-    Me_d_xy_dyn = J_xy_d/Mass_d * (J_xy_d/Mass_d)';
-    Me_d_xz_dyn = J_xz_d/Mass_d * (J_xz_d/Mass_d)';
-    Me_d_yz_dyn = J_yz_d/Mass_d * (J_yz_d/Mass_d)';
+    Me_d_xy_dyn = (J_xy_d/Mass_d) * (J_xy_d/Mass_d)';
+    Me_d_xz_dyn = (J_xz_d/Mass_d) * (J_xz_d/Mass_d)';
+    Me_d_yz_dyn = (J_yz_d/Mass_d) * (J_yz_d/Mass_d)';
     % dyn. Manip.
     Me_dyn_d = Jt_geom_d/Mass_d * (Jt_geom_d/Mass_d)';
 
@@ -415,7 +417,8 @@ for row_real = 1:50:num_rows_real
 
     subplot(1,3,1);
     hold on;
-    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+    % colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.003,.003,.003] * counter;
     trans = 0.1 + 0.01*counter;
     plotGMM(xt_xy, 1E-2*Me_d_xy_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
     plotGMM(xt_xy, 1E-2*Me_ct_xy_dyn, colTmp,  .4, '-', 3, 1); % Scaled matrix!
@@ -443,7 +446,7 @@ for row_real = 1:50:num_rows_real
     ylabel('$z$','fontsize',38,'Interpreter','latex');
     title(['Plot real and desired ME']);
     drawnow;
-    pause(0.8)
+    pause(1)
 end
 % % Plot projected ME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % for row_real = 1:num_rows_real
