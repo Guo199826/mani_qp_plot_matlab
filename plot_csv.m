@@ -8,22 +8,22 @@ addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
 % velocity_guid = readmatrix('joint_velocity_exam_force.csv'); 
 % velocity_real = readmatrix('joint_velocity_real_joint_limit.csv'); 
 % position_guid = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/bags/joint_position_real_1006.csv'); 
-position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_demo.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_1102.csv'); 
 % velocity_guid = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/bags/joint_velocity_real_1006.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_demo.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_1102.csv'); 
 
-position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_dyn.csv'); 
+position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/q_position_mean_traj.csv'); 
 % position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_joint_limit_ddq.csv'); 
 velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_dyn.csv'); 
 % velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_joint_limit_ddq.csv'); 
-xtrans_sigma = readmatrix('/home/gari/mani_check_exp/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
-% xtrans_mean = readmatrix('/home/gari/mani_check/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
-xtrans_mean = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/wrist_translation.csv');
+xtrans_sigma = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
+xtrans_mean = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
+% xtrans_mean = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/wrist_translation.csv');
 
 xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
 % remove time stamp and other useless columns
-position_guid = position_guid(:,5:end);
-position_real = position_real(1:1745,5:end);
+position_guid = position_guid(:,1:end);
+position_real = position_real(:,5:end);
 velocity_guid = velocity_guid(:,5:end);
 velocity_real = velocity_real(:,5:end);
 xtrans_sigma = xtrans_sigma(:,1:end);
@@ -183,31 +183,31 @@ hold on;
 % plot([1:num_rows_real].*dt, xt_traj_real(2,:) + dot_x(2,:), '-','color','g','Linewidth',linewidth_r);
 % plot([1:num_rows_real].*dt, xt_traj_real(3,:)  + dot_x(3,:), '-','color','b','Linewidth',linewidth_r);
 % guidance
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1)*0.001, '--','color','r','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2)*0.001, '--','color','g','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3)*0.001, '--','color','b','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1)*1, '--','color','r','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2)*1, '--','color','g','Linewidth',linewidth_r);
+plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3)*1, '--','color','b','Linewidth',linewidth_r);
 % real traj
 plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
 
-% t = [1:sigma_rows].*dt;
-% x_lb = xtrans_mean(:,1)  - xtrans_sigma(:,1);
-% x_ub = xtrans_mean(:,1) + xtrans_sigma(:,1);
-% y_lb = xtrans_mean(:,2) - xtrans_sigma(:,2);
-% y_ub = xtrans_mean(:,2) + xtrans_sigma(:,2);
-% z_lb = xtrans_mean(:,3) - xtrans_sigma(:,3);
-% z_ub = xtrans_mean(:,3) + xtrans_sigma(:,3);
+t = [1:sigma_rows].*dt;
+x_lb = xtrans_mean(:,1)  - xtrans_sigma(:,1);
+x_ub = xtrans_mean(:,1) + xtrans_sigma(:,1);
+y_lb = xtrans_mean(:,2) - xtrans_sigma(:,2);
+y_ub = xtrans_mean(:,2) + xtrans_sigma(:,2);
+z_lb = xtrans_mean(:,3) - xtrans_sigma(:,3);
+z_ub = xtrans_mean(:,3) + xtrans_sigma(:,3);
 
-% plot(t, x_lb, 'r', 'LineStyle','none');
-% plot(t, x_ub, 'r', 'LineStyle','none');
-% t2 = [t, fliplr(t)];
-% inBetween_x = [x_lb', flip(x_ub)'];
-% inBetween_y = [y_lb', flip(y_ub)'];
-% inBetween_z = [z_lb', flip(z_ub)'];
-% fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
-% fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
-% fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
+plot(t, x_lb, 'r', 'LineStyle','none');
+plot(t, x_ub, 'r', 'LineStyle','none');
+t2 = [t, fliplr(t)];
+inBetween_x = [x_lb', flip(x_ub)'];
+inBetween_y = [y_lb', flip(y_ub)'];
+inBetween_z = [z_lb', flip(z_ub)'];
+fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
+fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
+fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
 
 % y2 = 4 + cos(x).*exp(0.1*x);
 % y_lb = ;
@@ -311,7 +311,7 @@ counter = 0;
 
 % Vel. Manip.
 figure(6)
-for row_real = 1:20:num_rows_real % 50
+for row_real = 1:100:num_rows_real % 50
     counter = counter + 1;
     % ME: real traj
     Jt_geom = geomJ(robot,position_real(row_real,:));
@@ -371,83 +371,83 @@ for row_real = 1:20:num_rows_real % 50
     xlabel('$y$','fontsize',38,'Interpreter','latex');
     ylabel('$z$','fontsize',38,'Interpreter','latex');
     title(['Plot real and desired ME']);
+    pause(0.05)
     drawnow;
-    pause(0.1)
 end
 
-% Dyn. Manip.
-figure(7)
-% for row_real = 1:20:num_rows_real %50
-for row_real = 1:3
-    counter = counter + 1;
-    % ME: real traj
-    % Get Mass Matrix of panda
-    Mass_ct = get_MassMatrix(position_real(row_real,:)); 
-    Jt_geom = geomJ(robot,position_real(row_real,:));
-    J_xy = Jt_geom(4:5,:);
-    J_xz(1,:) = Jt_geom(4,:);
-    J_xz(2,:) = Jt_geom(6,:);
-    J_yz = Jt_geom(5:6,:);
-    Me_ct_xy_dyn = (J_xy/Mass_ct) * (J_xy/Mass_ct)';
-    Me_ct_xz_dyn = (J_xz/Mass_ct) * (J_xz/Mass_ct)';
-    Me_ct_yz_dyn = (J_yz/Mass_ct) * (J_yz/Mass_ct)';
-    % dyn. Manip.
-    Me_dyn_ct = (Jt_geom/Mass_ct) * (Jt_geom/Mass_ct)';
-
-    % ME: from guidance
-    % Get Mass Matrix of panda
-    Mass_d = get_MassMatrix(position_guid(row_real,:));    
-    Jt_geom_d = geomJ(robot,position_guid(row_real,:));
-    J_xy_d = Jt_geom_d(4:5,:);
-    J_xz_d(1,:) = Jt_geom_d(4,:);
-    J_xz_d(2,:) = Jt_geom_d(6,:);
-    J_yz_d = Jt_geom_d(5:6,:);
-    % Me_d = Jt_geom_d * Jt_geom_d'; 
-    Me_d_xy_dyn = (J_xy_d/Mass_d) * (J_xy_d/Mass_d)';
-    Me_d_xz_dyn = (J_xz_d/Mass_d) * (J_xz_d/Mass_d)';
-    Me_d_yz_dyn = (J_yz_d/Mass_d) * (J_yz_d/Mass_d)';
-    % dyn. Manip.
-    Me_dyn_d = Jt_geom_d/Mass_d * (Jt_geom_d/Mass_d)';
-
-    % xt
-    xt_xy = xt_traj_real(1:2,row_real);
-    xt_xz(1,1) = xt_traj_real(1,row_real);
-    xt_xz(2,1) = xt_traj_real(3,row_real);
-    xt_yz = xt_traj_real(2:3,row_real);
-
-    subplot(1,3,1);
-    hold on;
-    % colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
-    colTmp = [1-0.3, 1-0.3, 1-0.3] - [.003,.003,.003] * counter;
-    trans = 0.1 + 0.01*counter;
-    plotGMM(xt_xy, 1E-2*Me_d_xy_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_xy, 1E-2*Me_ct_xy_dyn, colTmp,  .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$x$','fontsize',38,'Interpreter','latex');
-    ylabel('$y$','fontsize',38,'Interpreter','latex');
-
-    subplot(1,3,2);
-    hold on;
-    plotGMM(xt_xz, 1E-2*Me_d_xz_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_xz, 1E-2*Me_ct_xz_dyn, colTmp, .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$x$','fontsize',38,'Interpreter','latex');
-    ylabel('$z$','fontsize',38,'Interpreter','latex');
-
-    subplot(1,3,3);
-    hold on;
-    plotGMM(xt_yz, 1E-2*Me_d_yz_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
-    plotGMM(xt_yz, 1E-2*Me_ct_yz_dyn, colTmp, .4, '-', 3, 1); % Scaled matrix!
-    % axis square;
-    % axis equal;
-    xlabel('$y$','fontsize',38,'Interpreter','latex');
-    ylabel('$z$','fontsize',38,'Interpreter','latex');
-    title(['Plot real and desired ME']);
-    drawnow;
-    pause(1)
-end
+% % Dyn. Manip.
+% figure(7)
+% % for row_real = 1:20:num_rows_real %50
+% for row_real = 1:3
+%     counter = counter + 1;
+%     % ME: real traj
+%     % Get Mass Matrix of panda
+%     Mass_ct = get_MassMatrix(position_real(row_real,:)); 
+%     Jt_geom = geomJ(robot,position_real(row_real,:));
+%     J_xy = Jt_geom(4:5,:);
+%     J_xz(1,:) = Jt_geom(4,:);
+%     J_xz(2,:) = Jt_geom(6,:);
+%     J_yz = Jt_geom(5:6,:);
+%     Me_ct_xy_dyn = (J_xy/Mass_ct) * (J_xy/Mass_ct)';
+%     Me_ct_xz_dyn = (J_xz/Mass_ct) * (J_xz/Mass_ct)';
+%     Me_ct_yz_dyn = (J_yz/Mass_ct) * (J_yz/Mass_ct)';
+%     % dyn. Manip.
+%     Me_dyn_ct = (Jt_geom/Mass_ct) * (Jt_geom/Mass_ct)';
+% 
+%     % ME: from guidance
+%     % Get Mass Matrix of panda
+%     Mass_d = get_MassMatrix(position_guid(row_real,:));    
+%     Jt_geom_d = geomJ(robot,position_guid(row_real,:));
+%     J_xy_d = Jt_geom_d(4:5,:);
+%     J_xz_d(1,:) = Jt_geom_d(4,:);
+%     J_xz_d(2,:) = Jt_geom_d(6,:);
+%     J_yz_d = Jt_geom_d(5:6,:);
+%     % Me_d = Jt_geom_d * Jt_geom_d'; 
+%     Me_d_xy_dyn = (J_xy_d/Mass_d) * (J_xy_d/Mass_d)';
+%     Me_d_xz_dyn = (J_xz_d/Mass_d) * (J_xz_d/Mass_d)';
+%     Me_d_yz_dyn = (J_yz_d/Mass_d) * (J_yz_d/Mass_d)';
+%     % dyn. Manip.
+%     Me_dyn_d = Jt_geom_d/Mass_d * (Jt_geom_d/Mass_d)';
+% 
+%     % xt
+%     xt_xy = xt_traj_real(1:2,row_real);
+%     xt_xz(1,1) = xt_traj_real(1,row_real);
+%     xt_xz(2,1) = xt_traj_real(3,row_real);
+%     xt_yz = xt_traj_real(2:3,row_real);
+% 
+%     subplot(1,3,1);
+%     hold on;
+%     % colTmp = [1-0.3, 1-0.3, 1-0.3] - [.015,.015,.015] * counter;
+%     colTmp = [1-0.3, 1-0.3, 1-0.3] - [.003,.003,.003] * counter;
+%     trans = 0.1 + 0.01*counter;
+%     plotGMM(xt_xy, 1E-2*Me_d_xy_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_xy, 1E-2*Me_ct_xy_dyn, colTmp,  .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$x$','fontsize',38,'Interpreter','latex');
+%     ylabel('$y$','fontsize',38,'Interpreter','latex');
+% 
+%     subplot(1,3,2);
+%     hold on;
+%     plotGMM(xt_xz, 1E-2*Me_d_xz_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_xz, 1E-2*Me_ct_xz_dyn, colTmp, .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$x$','fontsize',38,'Interpreter','latex');
+%     ylabel('$z$','fontsize',38,'Interpreter','latex');
+% 
+%     subplot(1,3,3);
+%     hold on;
+%     plotGMM(xt_yz, 1E-2*Me_d_yz_dyn, clrmap(3,:), .2, '-.', 2, 1); % Scaled matrix!
+%     plotGMM(xt_yz, 1E-2*Me_ct_yz_dyn, colTmp, .4, '-', 3, 1); % Scaled matrix!
+%     % axis square;
+%     % axis equal;
+%     xlabel('$y$','fontsize',38,'Interpreter','latex');
+%     ylabel('$z$','fontsize',38,'Interpreter','latex');
+%     title(['Plot real and desired ME']);
+%     drawnow;
+%     pause(1)
+% end
 % % Plot projected ME %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % for row_real = 1:num_rows_real
 % % % projected ME
@@ -512,7 +512,7 @@ end
 figure(9)
 hold on;
 % distance
-plot([1:num_rows_real].*dt, d_dyn(:,1), '-','color','r','Linewidth',linewidth_r);
+plot([1:num_rows_real].*dt, d(:,1), '-','color','r','Linewidth',linewidth_r);
 set(gca,'fontsize',14);
 xlim([0 num_rows*dt])
 xlabel('$t$','fontsize',22,'Interpreter','latex');
