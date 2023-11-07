@@ -3,21 +3,22 @@
 % Please change the base's reference frame in FrankaEmikaPandaRobot.m!
 % (try to combine several loops together
 addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
-position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_mani_1107.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_mani_1107.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_sing_0_1_1107.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_sing_0_1_1107.csv'); 
 % position_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_position_real_1103_ev.csv'); 
 % velocity_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_velocity_real_1103_ev.csv'); 
 
-position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/q_position_mean_traj.csv');  
-velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_dyn.csv'); 
+% position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/q_position_mean_traj.csv');  
+position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_exam_force_traj.csv');  
+% velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_exam_force_traj.csv'); 
 % position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_1102.csv');  
-% velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_1102.csv'); 
+velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_1102.csv'); 
 xtrans_sigma = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
 xtrans_mean = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
 
 xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
 % remove time stamp and other useless columns
-position_guid = position_guid(:,1:end);
+position_guid = position_guid(:,5:end);
 % position_guid = zeros(5863,7);
 position_real = position_real(1:end,5:end);
 velocity_guid = velocity_guid(:,5:end);
@@ -178,30 +179,28 @@ end
 figure(4)
 hold on;
 % guidance
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1)-0.1, '--','color','r','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2) +0.2, '--','color','g','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3) +0.1, '--','color','b','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(1,:), '--','color','r','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(2,:), '--','color','g','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(3,:), '--','color','b','Linewidth',linewidth_r);
 % real traj
 plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
 
-t = [1:sigma_rows].*dt;
-x_lb = xtrans_mean(:,1)-0.1 - xtrans_sigma(:,1);
-x_ub = xtrans_mean(:,1)-0.1 + xtrans_sigma(:,1);
-y_lb = xtrans_mean(:,2)+0.2 - xtrans_sigma(:,2);
-y_ub = xtrans_mean(:,2)+0.2 + xtrans_sigma(:,2);
-z_lb = xtrans_mean(:,3)+0.1 - xtrans_sigma(:,3);
-z_ub = xtrans_mean(:,3)+0.1 + xtrans_sigma(:,3);
+t = [1:num_rows].*dt;
+x_lb = xt_traj_guid(1,:)-0.2;
+x_ub = xt_traj_guid(1,:)+0.2;
+y_lb = xt_traj_guid(2,:)-0.2;
+y_ub = xt_traj_guid(2,:)+0.2;
+z_lb = xt_traj_guid(3,:)-0.2;
+z_ub = xt_traj_guid(3,:)+0.2;
 
 plot(t, x_lb, 'r', 'LineStyle','none');
 plot(t, x_ub, 'r', 'LineStyle','none');
 t2 = [t, fliplr(t)];
-inBetween_x = [x_lb', flip(x_ub)'];
-inBetween_y = [y_lb', flip(y_ub)'];
-inBetween_z = [z_lb', flip(z_ub)'];
-size(t2)
-size(inBetween_x)
+inBetween_x = [x_lb, flip(x_ub)];
+inBetween_y = [y_lb, flip(y_ub)];
+inBetween_z = [z_lb, flip(z_ub)];
 fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
 fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
 fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
