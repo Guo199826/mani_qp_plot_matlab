@@ -3,26 +3,33 @@
 % Please change the base's reference frame in FrankaEmikaPandaRobot.m!
 % (try to combine several loops together
 addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
-position_real = readmatrix('/home/gari/exp_tracking/src/mani_qp_controller/data/bags/joint_position_real_offset_strict_axis_1107.csv'); 
-velocity_real = readmatrix('/home/gari/exp_tracking/src/mani_qp_controller/data/bags/joint_velocity_real_offset_strict_axis_1107.csv'); 
-% position_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_position_real_1103_ev.csv'); 
-% velocity_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_velocity_real_1103_ev.csv'); 
+position_real = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/joint_position_real_guid_exec_task_1108_6.csv'); 
+velocity_real_ = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/joint_velocity_real_guid_exec_task_1108_6.csv'); 
+force_real_ = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/ext_force_guid_exec_task_1108_6.csv');
 
-position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/q_position_mean_traj.csv');  
-velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_dyn.csv'); 
-% position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_1102.csv');  
-% velocity_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_1102.csv'); 
-xtrans_sigma = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
-xtrans_mean = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
+% position_guid = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/q_position_mean_traj.csv');  
+position_guid = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/joint_position_real_guid_task_1108.csv');  
+velocity_guid = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/joint_position_real_guid_task_1108.csv'); 
+force_guid_ = readmatrix('/home/gari/mani_tracking_test_orig/src/mani_qp_controller/data/csv/ext_force_guid_task_1108.csv');
 
-xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
+% xtrans_sigma = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_sigma_traj_3.csv');
+% xtrans_mean = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/promp/xtrans_mean_traj.csv');
+% xtrans_pose = readmatrix('/home/gari/icra2024_YuGongSilvaFigueredoPeper/data_output/wrist_pose_Drill_2.csv');
+
 % remove time stamp and other useless columns
-position_guid = position_guid(:,1:end);
-% position_guid = zeros(5863,7);
-position_real = position_real(1:end,5:end);
+position_guid = position_guid(:,5:end);
+% position_guid = zeros(5895,7);
+position_real = position_real(:,5:end);
 velocity_guid = velocity_guid(:,5:end);
-velocity_real = velocity_real(:,5:end);
-xtrans_sigma = xtrans_sigma(:,1:end);
+velocity_real_ = velocity_real_(:,5:end);
+% Lowpass filter for measured joint velocity
+velocity_real = lowpass(velocity_real_,1,100);
+force_guid_ = force_guid_(:,5:end);
+force_real_ = force_real_(:,5:end);
+% Lowpass filter for measured force
+force_guid = lowpass(force_guid_, 0.1, 100);
+force_real = lowpass(force_real_, 0.1, 100);
+
 [sigma_rows, sigma_cols] = size(xtrans_sigma);
 [xtrans_mean_rows, xtrans_mean_cols] = size(xtrans_mean);
 xtrans_mean = xtrans_mean(:,1:end);
@@ -33,6 +40,9 @@ xtrans_mean = xtrans_mean(:,1:end);
 [num_rows_v, num_columns_v] = size(velocity_guid);
 [num_rows_v_real, num_columns_v_real] = size(velocity_real);
 [xtrans_pose_rows, xtrans_pose_cols] = size(xtrans_pose);
+[num_rows_f_guid, num_columns_f_guid] = size(force_guid)
+[num_rows_f_real, num_columns_f_real] = size(force_real);
+
 dt = 0.01;
 linewidth_g=1;
 linewidth_r=1;
@@ -178,36 +188,28 @@ end
 figure(4)
 hold on;
 % guidance
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,1)+0.08, '--','color','r','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,2) +0.2, '--','color','g','Linewidth',linewidth_r);
-plot([1:xtrans_mean_rows].*dt, xtrans_mean(:,3) +0.1, '--','color','b','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(1,:), '--','color','r','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(2,:), '--','color','g','Linewidth',linewidth_r);
+plot([1:num_rows].*dt, xt_traj_guid(3,:), '--','color','b','Linewidth',linewidth_r);
 % real traj
 plot([1:num_rows_real].*dt, xt_traj_real(1,:), '-','color','r','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(2,:), '-','color','g','Linewidth',linewidth_r);
 plot([1:num_rows_real].*dt, xt_traj_real(3,:), '-','color','b','Linewidth',linewidth_r);
 
-t = [1:sigma_rows].*dt;
-x_lb = xtrans_mean(:,1)+0.08 - xtrans_sigma(:,1);
-x_ub = xtrans_mean(:,1)+0.08 + xtrans_sigma(:,1);
-y_lb = xtrans_mean(:,2)+0.2 - xtrans_sigma(:,2);
-y_ub = xtrans_mean(:,2)+0.2 + xtrans_sigma(:,2);
-z_lb = xtrans_mean(:,3)+0.1 - xtrans_sigma(:,3);
-z_ub = xtrans_mean(:,3)+0.1 + xtrans_sigma(:,3);
-% x_lb = xtrans_mean(:,1)-0.1 - xtrans_sigma(:,1)*0.1;
-% x_ub = xtrans_mean(:,1)-0.1 + xtrans_sigma(:,1)*0.1;
-% y_lb = xtrans_mean(:,2)+0.2 - xtrans_sigma(:,2)*0.1;
-% y_ub = xtrans_mean(:,2)+0.2 + xtrans_sigma(:,2)*0.1;
-% z_lb = xtrans_mean(:,3)+0.2 - xtrans_sigma(:,3)*0.1;
-% z_ub = xtrans_mean(:,3)+0.2 + xtrans_sigma(:,3)*0.1;
+t = [1:num_rows].*dt;
+x_lb = xt_traj_guid(1,:)-0.2;
+x_ub = xt_traj_guid(1,:)+0.2;
+y_lb = xt_traj_guid(2,:)-0.2;
+y_ub = xt_traj_guid(2,:)+0.2;
+z_lb = xt_traj_guid(3,:)-0.2;
+z_ub = xt_traj_guid(3,:)+0.2;
 
 plot(t, x_lb, 'r', 'LineStyle','none');
 plot(t, x_ub, 'r', 'LineStyle','none');
 t2 = [t, fliplr(t)];
-inBetween_x = [x_lb', flip(x_ub)'];
-inBetween_y = [y_lb', flip(y_ub)'];
-inBetween_z = [z_lb', flip(z_ub)'];
-size(t2)
-size(inBetween_x)
+inBetween_x = [x_lb, flip(x_ub)];
+inBetween_y = [y_lb, flip(y_ub)];
+inBetween_z = [z_lb, flip(z_ub)];
 fill(t2, inBetween_x, 'g','FaceColor','r','FaceAlpha',.3,'EdgeAlpha',.3);
 fill(t2, inBetween_y, 'g','FaceColor','g','FaceAlpha',.3,'EdgeAlpha',.3);
 fill(t2, inBetween_z, 'g','FaceColor','b','FaceAlpha',.3,'EdgeAlpha',.3);
@@ -316,6 +318,7 @@ for row_real = 1:200:num_rows_real
     Me_ct_yz = J_yz * J_yz';
 
     % ME: from guidance
+
     Jt_geom_d = geomJ(robot,position_guid(row_real,:));
     J_xy_d = Jt_geom_d(4:5,:);
     J_xz_d(1,:) = Jt_geom_d(4,:);
@@ -339,9 +342,9 @@ for row_real = 1:200:num_rows_real
 
     figure(6)
     hold on;
-    colTmp = [1-0.1, 1-0.1, 1-0.1] - [.05,.05,.05] * counter;
+    colTmp = [1-0.1, 1-0.1, 1-0.1] - [.03,.03,.03] * counter;
     transpFactor = .05 + 0.02*counter;
-    edgFactor = .5 + 0.03*counter;
+    edgFactor = .5 + 0.01*counter;
     plotGMM(xt_xy, 1E-2*Me_d_xy, clrmap(3,:), transpFactor, '-.', 2, edgFactor); % Scaled matrix!
     plotGMM(xt_xy, 1E-2*Me_ct_xy, colTmp, .4, '-', 3, 1); % Scaled matrix!
     set(gca,'FontSize',14);
@@ -470,8 +473,8 @@ end
 % set(gca,'xtick',[],'ytick',[])
 % axis equal;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure(10)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure
 hold on;
 % distance
 plot([1:num_rows_real].*dt, d(:,1), '-','color','r','Linewidth',linewidth_r);
@@ -514,4 +517,80 @@ ylabel(['Eigenvalue'],'FontSize',22,'Interpreter','latex');
 title(['Eigenvalue of ME'],'FontSize',28,'Interpreter','latex');
 grid on;
 
+% Plot external force %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure
+hold on;
+% guidance
+plot([1:num_rows_f_guid].*dt, force_guid(:,1), '--','color','r','Linewidth',linewidth_g);
+plot([1:num_rows_f_guid].*dt, force_guid(:,2), '--','color','g','Linewidth',linewidth_g);
+plot([1:num_rows_f_guid].*dt, force_guid(:,3), '--','color','b','Linewidth',linewidth_g);
+plot([1:num_rows_f_guid].*dt, force_guid(:,4), '--','color','c','Linewidth',linewidth_g);
+plot([1:num_rows_f_guid].*dt, force_guid(:,5), '--','color','m','Linewidth',linewidth_g);
+plot([1:num_rows_f_guid].*dt, force_guid(:,6), '--','color','#D95319','Linewidth',linewidth_g);
+% real traj
+plot([1:num_rows_f_real].*dt, force_real(:,1), '-','color','r','Linewidth',linewidth_r);
+plot([1:num_rows_f_real].*dt, force_real(:,2), '-','color','g','Linewidth',linewidth_r);
+plot([1:num_rows_f_real].*dt, force_real(:,3), '-','color','b','Linewidth',linewidth_r);
+plot([1:num_rows_f_real].*dt, force_real(:,4), '-','color','c','Linewidth',linewidth_r);
+plot([1:num_rows_f_real].*dt, force_real(:,5), '-','color','m','Linewidth',linewidth_r);
+plot([1:num_rows_f_real].*dt, force_real(:,6), '-','color','#D95319','Linewidth',linewidth_r);
+set(gca,'fontsize',14);
+set(gcf,'position',[10,10,800,480])
+xlim([0 num_rows_f_guid*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$q$','fontsize',22,'Interpreter','latex');
+legend('F_x','F_y','F_z','M_x','M_y','M_z');
+xlabel('Time t(s)','fontsize',22,'Interpreter','latex');
+ylabel(['External Force(N) and Torque(Nm)'],'fontsize',22,'Interpreter','latex');
+% title(['Plot of joint position during guidance'],'fontsize',28);
+grid on;
 
+% Plot norm of external force %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure
+force_guid_norm = zeros(1,num_rows_f_guid);
+torque_guid_norm = zeros(1,num_rows_f_guid);
+force_real_norm = zeros(1,num_rows_f_real);
+torque_real_norm = zeros(1,num_rows_f_real);
+for i = 1:num_rows_f_real
+    force_real_norm(1,i) = norm(force_real(i,1:3));
+    torque_real_norm(1,i) = norm(force_real(i,4:6));
+end
+for i = 1:num_rows_f_guid
+    force_guid_norm(1,i) = norm(force_guid(i,1:3));
+    torque_guid_norm(1,i) = norm(force_guid(i,4:6));
+end
+% External Force
+subplot(1,2,1)
+hold on;
+% guidance
+plot([1:num_rows_f_guid].*dt, force_guid_norm, '--','color','r','Linewidth',linewidth_g);
+% real traj
+plot([1:num_rows_f_real].*dt, force_real_norm, '-','color','r','Linewidth',linewidth_r);
+set(gca,'fontsize',14);
+set(gcf,'position',[10,10,800,480])
+xlim([0 num_rows_f_guid*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$q$','fontsize',22,'Interpreter','latex');
+legend('Guidance','Guidance with Assist');
+xlabel('Time t(s)','fontsize',22,'Interpreter','latex');
+ylabel(['External Force(N)'],'fontsize',22,'Interpreter','latex');
+% title(['Plot of joint position during guidance'],'fontsize',28);
+grid on;
+
+% External Torque
+subplot(1,2,2)
+hold on;
+% guidance
+plot([1:num_rows_f_guid].*dt, torque_guid_norm, '--','color','r','Linewidth',linewidth_g);
+% real traj
+plot([1:num_rows_f_real].*dt, torque_real_norm, '-','color','r','Linewidth',linewidth_r);
+set(gca,'fontsize',14);
+set(gcf,'position',[10,10,800,480])
+xlim([0 num_rows_f_guid*dt])
+% xlabel('$t$','fontsize',22,'Interpreter','latex');
+% ylabel('$q$','fontsize',22,'Interpreter','latex');
+legend('Guidance','Guidance with Assist');
+xlabel('Time t(s)','fontsize',22,'Interpreter','latex');
+ylabel(['External Torque(Nm)'],'fontsize',22,'Interpreter','latex');
+% title(['Plot of joint position during guidance'],'fontsize',28);
+grid on;

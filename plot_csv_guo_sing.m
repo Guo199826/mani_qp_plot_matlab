@@ -3,8 +3,8 @@
 % Please change the base's reference frame in FrankaEmikaPandaRobot.m!
 % (try to combine several loops together
 addpath(genpath('..\..\..\dqrobotics-toolbox-matlab'));
-position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_sing_0_1_1107.csv'); 
-velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_sing_0_1_1107.csv'); 
+position_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_position_real_sing_limitoff_1107.csv'); 
+velocity_real = readmatrix('/home/gari/mani_check_before/src/mani_qp_controller/data/bags/joint_velocity_real_sing_limitoff_1107.csv'); 
 % position_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_position_real_1103_ev.csv'); 
 % velocity_real = readmatrix('/home/gari/mani_tracking_test/src/mani_qp_controller/data/csv/joint_velocity_real_1103_ev.csv'); 
 
